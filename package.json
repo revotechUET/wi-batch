@@ -1,0 +1,7 @@
+{
+  "name": "wi-batch",
+  "version": "0.0.1",
+  "dependencies": {
+    "async": "^2.6.0"
+  }
+}
