@@ -2,6 +2,8 @@
   "name": "wi-batch",
   "version": "0.0.1",
   "dependencies": {
-    "async": "^2.6.0"
+    "async": "^2.6.0",
+    "byline": "^5.0.0",
+    "readdir-enhanced": "^2.2.0"
   }
 }
