@@ -4,6 +4,7 @@
   "dependencies": {
     "async": "^2.6.0",
     "byline": "^5.0.0",
-    "readdir-enhanced": "^2.2.0"
+    "readdir-enhanced": "^2.2.0",
+    "request": "^2.83.0"
   }
 }

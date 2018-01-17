@@ -7,3 +7,5 @@ build
 
 # Yarn
 yarn.lock
+/wi-batch.iml
+/.idea/
