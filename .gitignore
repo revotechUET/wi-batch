@@ -12,7 +12,6 @@ yarn.lock
 /config/production.json
 /datadir/
 /workflows/
-/uploads/
 !/datadir/readme.txt
 !/workflows/readme.txt
 !/uploads/readme.txt
