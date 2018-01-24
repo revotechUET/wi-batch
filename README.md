@@ -18,7 +18,7 @@ Add token to header, payload, url:
 	"dataDir" : "sample"
 }
 ```
-#### GET:
+#### GET **/workflow/generate**:
 ```json
 {
 	"username": "hoang",
