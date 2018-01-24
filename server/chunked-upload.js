@@ -4,7 +4,6 @@ let uuidv5 = require('uuid/v5');
 let router = express.Router();
 let fs = require('fs');
 let path = require('path');
-let cors = require('cors');
 let responseJSON = require('./response');
 let utils = require('./utils');
 
@@ -13,7 +12,6 @@ let _transactions = new Object();
 let BASEPATH = path.join(__dirname, '../', 'uploads');
 
 const NAMESPACE = '5b671a64-80d5-491e-9ab0-da01ff8f3341';
-router.use(cors());
 router.use(express.json({limit: "5mb"}));
 
 router.get('/chunked-upload', function (req, res) {

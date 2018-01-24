@@ -5,7 +5,8 @@ let controller = require('./server/controller');
 let bodyParser = require('body-parser');
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
-
+let cors = require('cors');
+app.use(cors());
 app.use(express.static("client"));
 app.use(bodyParser.urlencoded({extended: false}));
 
