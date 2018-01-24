@@ -3,34 +3,6 @@ let fs = require('fs');
 let byline = require('byline');
 let Path = require('path');
 let async = require('async');
-let config = require('config');
-let loginUrl = 'http://' + config.authenService.host + ':' + config.authenService.port + '/' + config.authenService.path;
-
-function doLogin(username, password, callback) {
-    let options = {
-        method: 'POST',
-        url: loginUrl,
-        headers:
-            {
-                'Cache-Control': 'no-cache',
-                'Content-Type': 'application/json'
-            },
-        body: {username: username, password: password},
-        json: true
-    };
-    request(options, function (error, response, body) {
-        if (error) throw new Error(error);
-        if (body.content) {
-            if (body.content.token) {
-                callback(null, body.content.token);
-            } else {
-                callback(body.reason, null);
-            }
-        } else {
-            callback("No content", null);
-        }
-    });
-}
 
 function uploadFile(filePath, uploadUrl, headers, callback) {
     console.log("==================================");
@@ -60,8 +32,11 @@ function uploadFile(filePath, uploadUrl, headers, callback) {
 function uploadMultiFiles(workflowConfig, cb) {
     let socket = workflowConfig.socket;
     let workflowDir = workflowConfig.workflowDir;
-    let errorStream = fs.createWriteStream(Path.join(workflowDir, 'error.txt'));
-    let doneStream = fs.createWriteStream(Path.join(workflowDir, 'done.txt'));
+    let errorStream = fs.createWriteStream(Path.join(workflowDir, 'error.txt'), {'flags': 'a'});
+    let doneStream = fs.createWriteStream(Path.join(workflowDir, 'done.txt'), {'flags': 'a'});
+    let currentTime = new Date().toLocaleString('en-US', {timeZone: "Asia/Ho_Chi_Minh"});
+    doneStream.write("<<================== " + currentTime + " ==================\n");
+    errorStream.write("<<================== " + currentTime + " ==================\n");
     let uploadUrl = "http://" + workflowConfig.host + ':' + workflowConfig.port + workflowConfig.path;
     let queue = async.queue(function (task, callback) {
         if (task.success || !task.path || !task.path.length) {
@@ -113,9 +88,12 @@ function uploadMultiFiles(workflowConfig, cb) {
 
     queue.drain = function () {
         console.log('All item has been processed');
+        doneStream.write("================== End ==================>>\n\n\n");
+        errorStream.write("================== End ==================>>\n\n\n");
         errorStream.end();
         doneStream.end(null, null, function () {
-            fs.renameSync(Path.join(workflowDir, 'done.txt'), Path.join(workflowDir, 'all.txt'));
+            // fs.renameSync(Path.join(workflowDir, 'done.txt'), Path.join(workflowDir, 'all.txt'));
+            cb();
         });
     };
 
@@ -128,7 +106,7 @@ function uploadMultiFiles(workflowConfig, cb) {
             success: (tokens.length > 1) ? parseInt(tokens[1]) : 0
         }, function (res) {
             // console.log(res);
-            socket.emit("run-work-flow-result", res);
+            if (socket) socket.emit("run-workflow-file-result", {message: res});
             doneStream.write(res.path + "||" + res.success + "\n");
             if (res.success === 0) {
                 errorStream.write(res.path + "||" + res.error + "\n");
@@ -138,6 +116,5 @@ function uploadMultiFiles(workflowConfig, cb) {
 }
 
 module.exports = {
-    doLogin: doLogin,
     uploadMultiFiles: uploadMultiFiles
 }

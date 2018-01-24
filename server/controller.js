@@ -5,14 +5,6 @@ let path = require('path');
 let utils = require('./utils');
 let responseJSON = require('./response');
 
-// class Response {
-//     constructor(code, reason, content) {
-//         this.code = code;
-//         this.reason = reason;
-//         this.content = content;
-//     }
-// }
-
 let generateNewWorkflow = function (data, callback, username) {
     if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username))) {
         fs.mkdirSync(path.join(__dirname, '../', 'workflows', username));
@@ -21,9 +13,7 @@ let generateNewWorkflow = function (data, callback, username) {
     let myConfig = {
         host: data.host,
         port: data.port,
-        path: data.path,
-        username: data.username,
-        password: data.password
+        path: data.path
     }
     genWorkflow(myConfig, data.workflowName, data.dataDir, function (err, file) {
         if (err) {
@@ -38,28 +28,19 @@ let generateNewWorkflow = function (data, callback, username) {
     }, username);
 };
 
-let runAWorkflow = function (data, callback, username) {
+let runAWorkflow = function (data, callback, username, token) {
     let workflowName = data.workflowName;
     let workflowConfig = null;
     try {
         workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, workflowName, 'workflow.json')).toString());
         workflowConfig.workflowDir = path.join(__dirname, '../', 'workflows', username, workflowName);
         workflowConfig.socket = data.socket;
+        workflowConfig.token = token;
     } catch (err) {
         return callback(responseJSON(512, "NO_WORKFLOW_FOUND", {}));
     }
-    runWorkflow.doLogin(workflowConfig.username, workflowConfig.password, function (err, result) {
-        if (err) {
-            //login failed
-            callback(responseJSON(401, err, {}));
-        } else {
-            //login successful
-            workflowConfig.token = result;
-            runWorkflow.uploadMultiFiles(workflowConfig, function () {
-
-            });
-            callback(responseJSON(200, "Successfull", workflowConfig));
-        }
+    runWorkflow.uploadMultiFiles(workflowConfig, function () {
+        callback(responseJSON(200, "Successfull", workflowConfig));
     });
 };
 

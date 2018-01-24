@@ -13,7 +13,7 @@ module.exports = function () {
                     res.status(401).send(responseJSON(512, "Authentication failed", "Authentication failed"));
                 } else {
                     req.decoded = decoded;
-                    console.log("Passed");
+                    req.token = token;
                     next();
                 }
             });

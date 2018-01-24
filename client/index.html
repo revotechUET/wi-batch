@@ -10,10 +10,20 @@
 </head>
 <script>
     let socket = io("http://localhost:33333");
-    socket.emit("run-work-flow", "hoang");
-    socket.on("run-work-flow-result", function (data) {
+    let data = {
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhvYW5nIiwiaWF0IjoxNTE2NzU5OTQ4LCJleHAiOjE1MTY4NDYzNDh9.NmFlcIDfOyswMxm8m70CZRKCm_Gidjs4r4pQwj41B5M",
+        workflowName: "hoang"
+    };
+    socket.emit("run-workflow", data);
+    socket.on("run-workflow-file-result", function (data) {
         document.write(JSON.stringify(data) + "</br>");
     });
+    socket.on("run-workflow-done", function (data) {
+        document.write(JSON.stringify(data.meesage) + "</br>");
+    });
+    socket.on("authenticate-failed", function (data) {
+        document.write(JSON.stringify(data.message) + "</br>");
+    })
 </script>
 <body>
 Hello!

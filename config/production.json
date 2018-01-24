@@ -3,11 +3,6 @@
     "port": 33333,
     "jwtSecretKey": "secretKey"
   },
-  "authenService": {
-    "host": "login.sflow.me",
-    "port": 80,
-    "path": "login"
-  },
   "database": {
     "host": "localhost",
     "port": 3306,
