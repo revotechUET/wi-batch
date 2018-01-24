@@ -9,3 +9,8 @@ build
 yarn.lock
 /wi-batch.iml
 /.idea/
+/config/production.json
+/datadir/
+/workflows/
+!/datadir/readme.txt
+!/workflows/readme.txt

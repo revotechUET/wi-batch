@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<script>
+    let socket = io("http://localhost:33333");
+    socket.emit("run-work-flow", "hoang");
+    socket.on("run-work-flow-result", function (data) {
+        document.write(JSON.stringify(data) + "</br>");
+    });
+</script>
+<body>
+Hello!
+</body>
+</html>
