@@ -64,13 +64,26 @@ let listWorkflow = function (data, callback) {
     let workflwoFolder = path.join(__dirname, '../', 'workflows');
     let files = [];
     fs.readdirSync(workflwoFolder).forEach(file => {
-        let info = {};
-        info.workflowName = file;
-        info.worflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', file, 'workflow.json')).toString());
-        files.push(info);
+        if (file != 'readme.txt') {
+            let info = {};
+            info.workflowName = file;
+            info.worflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', file, 'workflow.json')).toString());
+            files.push(info);
+        }
     });
     callback(responseJSON(200, "Successfull", files));
 };
+
+let listDataDir = function (data, callback) {
+    let dataDirFolder = path.join(__dirname, '../', 'dataDir');
+    let files = [];
+    fs.readdirSync(dataDirFolder).forEach(file => {
+        if (file != 'readme.txt') {
+            files.push(file);
+        }
+    });
+    callback(responseJSON(200, "Successfull", files));
+}
 
 let deleteWorkflow = function (payload, callback) {
     if (payload.workflowName) {
@@ -86,5 +99,6 @@ module.exports = {
     generateNewWorkflow: generateNewWorkflow,
     runAWorkflow: runAWorkflow,
     listWorkflow: listWorkflow,
-    deleteWorkflow: deleteWorkflow
+    deleteWorkflow: deleteWorkflow,
+    listDataDir: listDataDir
 };
