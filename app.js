@@ -7,12 +7,14 @@ let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
 app.use(express.static("client"));
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 let authenticate = require('./server/authenticate');
 
 app.use(authenticate());
+
+app.use('/', require('./server/chunked-upload'));
+
 
 io.on('connection', function (socket) {
     console.log("A client connected");
@@ -28,11 +30,6 @@ io.on('connection', function (socket) {
 
         }, username);
     });
-});
-
-app.use(function (req, res, next) {
-    console.log("Middleware");
-    next();
 });
 
 app.get('/', function (req, res) {
