@@ -5,16 +5,19 @@ let path = require('path');
 let utils = require('./utils');
 let responseJSON = require('./response');
 
-class Response {
-    constructor(code, reason, content) {
-        this.code = code;
-        this.reason = reason;
-        this.content = content;
-    }
-}
+// class Response {
+//     constructor(code, reason, content) {
+//         this.code = code;
+//         this.reason = reason;
+//         this.content = content;
+//     }
+// }
 
-let generateNewWorkflow = function (data, callback) {
-    if (!data.workflowName) return callback(new Response(512, "NEED WORKFLOW NAME", {}));
+let generateNewWorkflow = function (data, callback, username) {
+    if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username))) {
+        fs.mkdirSync(path.join(__dirname, '../', 'workflows', username));
+    }
+    if (!data.workflowName) return callback(responseJSON(512, "NEED WORKFLOW NAME", {}));
     let myConfig = {
         host: data.host,
         port: data.port,
@@ -28,27 +31,27 @@ let generateNewWorkflow = function (data, callback) {
         } else {
             let response = {};
             response.filesList = fs.readFileSync(file).toString().split("\n");
-            response.info = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', data.workflowName, 'workflow.json')).toString());
+            response.info = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, data.workflowName, 'workflow.json')).toString());
             response.filesList.splice(response.filesList.length - 1, 1);
             callback(responseJSON(200, "Successfull", response));
         }
-    });
+    }, username);
 };
 
-let runAWorkflow = function (data, callback) {
+let runAWorkflow = function (data, callback, username) {
     let workflowName = data.workflowName;
     let workflowConfig = null;
     try {
-        workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', workflowName, 'workflow.json')).toString());
-        workflowConfig.workflowDir = path.join(__dirname, '../', 'workflows', workflowName);
+        workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, workflowName, 'workflow.json')).toString());
+        workflowConfig.workflowDir = path.join(__dirname, '../', 'workflows', username, workflowName);
         workflowConfig.socket = data.socket;
     } catch (err) {
-        return callback(new Response(512, "NO_WORKFLOW_FOUND", {}));
+        return callback(responseJSON(512, "NO_WORKFLOW_FOUND", {}));
     }
     runWorkflow.doLogin(workflowConfig.username, workflowConfig.password, function (err, result) {
         if (err) {
             //login failed
-            callback(new Response(401, err, {}));
+            callback(responseJSON(401, err, {}));
         } else {
             //login successful
             workflowConfig.token = result;
@@ -60,22 +63,28 @@ let runAWorkflow = function (data, callback) {
     });
 };
 
-let listWorkflow = function (data, callback) {
-    let workflwoFolder = path.join(__dirname, '../', 'workflows');
+let listWorkflow = function (data, callback, username) {
+    if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username))) {
+        fs.mkdirSync(path.join(__dirname, '../', 'workflows', username));
+    }
+    let workflwoFolder = path.join(__dirname, '../', 'workflows', username);
     let files = [];
     fs.readdirSync(workflwoFolder).forEach(file => {
         if (file != 'readme.txt') {
             let info = {};
             info.workflowName = file;
-            info.worflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', file, 'workflow.json')).toString());
+            info.worflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, file, 'workflow.json')).toString());
             files.push(info);
         }
     });
     callback(responseJSON(200, "Successfull", files));
 };
 
-let listDataDir = function (data, callback) {
-    let dataDirFolder = path.join(__dirname, '../', 'dataDir');
+let listDataDir = function (data, callback, username) {
+    if (!fs.existsSync(path.join(__dirname, '../', 'dataDir', username))) {
+        fs.mkdirSync(path.join(__dirname, '../', 'dataDir', username));
+    }
+    let dataDirFolder = path.join(__dirname, '../', 'dataDir', username);
     let files = [];
     fs.readdirSync(dataDirFolder).forEach(file => {
         if (file != 'readme.txt') {
@@ -85,9 +94,9 @@ let listDataDir = function (data, callback) {
     callback(responseJSON(200, "Successfull", files));
 }
 
-let deleteWorkflow = function (payload, callback) {
+let deleteWorkflow = function (payload, callback, username) {
     if (payload.workflowName) {
-        let deletePath = path.join(__dirname, '../', 'workflows', payload.workflowName);
+        let deletePath = path.join(__dirname, '../', 'workflows', username, payload.workflowName);
         utils.deleteFolder(deletePath);
         callback(responseJSON(200, "Successfull", payload.workflowName));
     } else {

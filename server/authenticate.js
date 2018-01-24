@@ -1,7 +1,7 @@
 let configApp = require('config').app;
 let jwt = require('jsonwebtoken');
 let responseJSON = require('./response');
-let model = require('./model');
+// let model = require('./model');
 
 
 module.exports = function () {

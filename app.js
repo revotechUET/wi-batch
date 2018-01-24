@@ -16,6 +16,7 @@ app.use(authenticate());
 
 io.on('connection', function (socket) {
     console.log("A client connected");
+    let username = "hoang";
     socket.on('disconnect', function () {
         console.log("Client out");
     });
@@ -25,7 +26,7 @@ io.on('connection', function (socket) {
         data.socket = socket;
         controller.runAWorkflow(data, function () {
 
-        });
+        }, username);
     });
 });
 
@@ -48,13 +49,13 @@ app.get('/workflow/generate', function (req, res) {
     data.password = req.query.password;
     controller.generateNewWorkflow(data, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.post('/workflow/generate', function (req, res) {
     controller.generateNewWorkflow(req.body, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 
 });
 
@@ -63,7 +64,7 @@ app.get('/workflow/run', function (req, res) {
     data.workflowName = req.query.workflowName;
     controller.runAWorkflow(data, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.post('/workflow/run', function (req, res) {
@@ -71,43 +72,43 @@ app.post('/workflow/run', function (req, res) {
     data.workflowName = req.body.workflowName;
     controller.runAWorkflow(data, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.get('/workflow/list', function (req, res) {
     controller.listWorkflow(req, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.post('/workflow/list', function (req, res) {
     controller.listWorkflow(req, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.post('/workflow/delete', function (req, res) {
     controller.deleteWorkflow(req.body, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.get('/workflow/delete', function (req, res) {
     controller.deleteWorkflow(req.query, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.post('/workflow/data-list', function (req, res) {
     controller.listDataDir(req.body, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 app.get('/workflow/data-list', function (req, res) {
     controller.listDataDir(req.query, function (done) {
         res.send(done);
-    });
+    }, req.decoded.username);
 });
 
 http.listen(config.app.port, (err) => {
