@@ -23,9 +23,9 @@ router.get('/chunked-upload', function (req, res) {
 router.post('/chunked-upload', function (req, res) {
     let fileType = req.body.fileName.substring(req.body.fileName.lastIndexOf('.'));
     if (fileType != '.zip') {
-        res.send(responseJSON(512, "Not zip file"));
+        res.status(400).send(responseJSON(512, "Not zip file"));
     } else {
-        let username = "hoang";
+        let username = req.decoded.username;
         if (!fs.existsSync(path.join(BASEPATH, username))) {
             fs.mkdirSync(path.join(BASEPATH, username));
         }
