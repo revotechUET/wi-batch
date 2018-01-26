@@ -20,7 +20,7 @@ router.get('/chunked-upload', function (req, res) {
 
 function checkMaxWorkspace(username) {
     return new Promise(function (resolve) {
-        let maxWorkspace = configApp.USER_MAX_WORKSPACE;
+        let maxWorkspace = configApp.USER_MAX_DATADIR;
         let userWorkspaces = 1;
         try {
             fs.readdirSync(path.join(__dirname, '../', 'datadir', username)).forEach(() => {
@@ -79,7 +79,7 @@ router.post('/chunked-upload', async function (req, res) {
         if (!passMaxWorkspace) {
             return res.status(500).send({
                 code: 512,
-                reason: "You got max workspaces!",
+                reason: "You got max data directory!",
                 transactionId: ""
             });
         }

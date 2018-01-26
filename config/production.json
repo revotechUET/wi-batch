@@ -2,7 +2,7 @@
   "app": {
     "port": 33333,
     "jwtSecretKey": "secretKey",
-    "USER_MAX_WORKSPACE": 3
+    "USER_MAX_DATADIR": 3
   },
   "database": {
     "host": "localhost",
