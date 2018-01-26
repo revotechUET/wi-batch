@@ -117,7 +117,6 @@ router.post('/chunked-upload', async function (req, res) {
     let written = fs.writeSync(transaction.targetFile, req.body.fileData, undefined, 'base64');
     transaction.lastByteUpload = transaction.currentByteUpload;
     transaction.currentByteUpload = transaction.lastByteUpload + written;
-
     if (req.body.fileEnd) {
         console.log('close');
         fs.closeSync(transaction.targetFile);
@@ -128,7 +127,8 @@ router.post('/chunked-upload', async function (req, res) {
         utils.unZipFile(file, username, function (err, result) {
             if (err) {
                 console.log(err);
-                res.send({
+                // fs.rmdirSync(path.join(__dirname, '../', 'datadir', username, file.name));
+                res.status(512).send({
                     code: 512,
                     reason: err.message,
                     transactionId: transactionId
@@ -141,6 +141,12 @@ router.post('/chunked-upload', async function (req, res) {
                     transactionId: transactionId
                 });
             }
+        });
+    } else {
+        res.send({
+            code: 200,
+            reason: "success",
+            transactionId: transactionId
         });
     }
 });

@@ -20,17 +20,18 @@ function deleteFolder(path) {
 
 function unZipFile(file, username, callback) {
     let unzipStream = unzip.Extract({path: path.join(__dirname, '../', 'datadir', username, file.name)});
-    fs.createReadStream(file.path).pipe(unzipStream);
-    unzipStream.on('error', function(err) {
+    unzipStream.on('error', function (err) {
         fs.unlinkSync(file.path);
         console.log('error', file.path);
-        callback(err, null);
+        console.log('path', path.join(__dirname, '../', 'datadir', username, file.name));
+        return callback(err, null);
     });
-    unzipStream.on('close', function() {
+    unzipStream.on('close', function () {
         fs.unlinkSync(file.path);
         console.log('success', file.path);
-        callback(null, "Extract Done");
+        return callback(null, "Extract Done");
     });
+    fs.createReadStream(file.path).pipe(unzipStream);
 }
 
 module.exports = {

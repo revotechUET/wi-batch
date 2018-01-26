@@ -8,8 +8,8 @@ module.exports = function genWorkflow(config, name, folderName, callback, userna
     if (!fs.existsSync(workflowDir)) {
         fs.mkdirSync(workflowDir, 0744);
     } else {
-        console.error("Workflow existed!");
-        return callback("Workflow existed!", null);
+        console.error("Batch job existed!");
+        return callback("Batch job existed!", null);
     }
     let wfFile = Path.join(workflowDir, "workflow.json");
     fs.writeFileSync(wfFile, JSON.stringify(config, null, 4));
