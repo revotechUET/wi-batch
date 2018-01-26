@@ -1,6 +1,6 @@
 let fs = require('fs');
-let unzip = require('unzip');
 let path = require('path');
+let extract = require('extract-zip');
 
 function deleteFolder(path) {
     let files = [];
@@ -19,19 +19,14 @@ function deleteFolder(path) {
 };
 
 function unZipFile(file, username, callback) {
-    let unzipStream = unzip.Extract({path: path.join(__dirname, '../', 'datadir', username, file.name)});
-    unzipStream.on('error', function (err) {
-        fs.unlinkSync(file.path);
-        console.log('error', file.path);
-        console.log('path', path.join(__dirname, '../', 'datadir', username, file.name));
-        return callback(err, null);
-    });
-    unzipStream.on('close', function () {
-        fs.unlinkSync(file.path);
-        console.log('success', file.path);
-        return callback(null, "Extract Done");
-    });
-    fs.createReadStream(file.path).pipe(unzipStream);
+    extract(file.path, {dir: path.join(__dirname, '../', 'datadir', username, file.name)}, function (err) {
+        if (err) {
+            fs.rmdirSync(path.join(__dirname, '../', 'datadir', username, file.name));
+            callback(err, null);
+        } else {
+            callback(null, "Extract Done");
+        }
+    })
 }
 
 module.exports = {
