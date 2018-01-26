@@ -62,16 +62,21 @@ router.post('/chunked-upload', function (req, res) {
             utils.unZipFile(file, username, function (err, result) {
                 if (err) {
                     console.log(err);
+                    res.send({
+                        code: 512,
+                        reason: err.message,
+                        transactionId: transactionId
+                    });
                 } else {
                     console.log(result);
+                    res.send({
+                        code: 200,
+                        reason: "success",
+                        transactionId: transactionId
+                    });
                 }
             });
         }
-        res.send({
-            code: 200,
-            reason: "success",
-            transactionId: transactionId
-        });
     }
 
 });
