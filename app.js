@@ -118,6 +118,18 @@ app.get('/workflow/data-list', function (req, res) {
     }, req.decoded.username, req.token);
 });
 
+app.post('/workflow/delete-data', function (req, res) {
+    controller.deleteDataDir(req.body, function (done) {
+        res.send(done);
+    }, req.decoded.username);
+});
+
+app.get('/workflow/delete-data', function (req, res) {
+    controller.deleteDataDir(req.query, function (done) {
+        res.send(done);
+    }, req.decoded.username);
+});
+
 http.listen(config.app.port, (err) => {
     if (!err) console.log('Server is listening on', config.app.port);
 });

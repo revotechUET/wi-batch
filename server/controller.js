@@ -13,7 +13,8 @@ let generateNewWorkflow = function (data, callback, username) {
     let myConfig = {
         host: data.host,
         port: data.port,
-        path: data.path
+        path: data.path,
+        dataDir: data.dataDir
     }
     genWorkflow(myConfig, data.workflowName, data.dataDir, function (err, file) {
         if (err) {
@@ -85,10 +86,28 @@ let deleteWorkflow = function (payload, callback, username) {
     }
 };
 
+let deleteDataDir = function (payload, callback, username) {
+    let response = [];
+    let dataDir = payload.dataDir;
+    let dataPath = path.join(__dirname, '../', 'datadir', username, dataDir);
+    utils.deleteFolder(dataPath);
+    fs.readdirSync(path.join(__dirname, '../', 'workflows', username)).forEach(file => {
+        if (file != 'readme.txt') {
+            let workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, file)).toString());
+            if (workflowConfig.dataDir === dataDir) {
+                utils.deleteFolder(path.join(__dirname, '../', 'workflows', username));
+                response.push(file);
+            }
+        }
+    });
+    responseJSON(200, "Successfull", response);
+};
+
 module.exports = {
     generateNewWorkflow: generateNewWorkflow,
     runAWorkflow: runAWorkflow,
     listWorkflow: listWorkflow,
     deleteWorkflow: deleteWorkflow,
-    listDataDir: listDataDir
+    listDataDir: listDataDir,
+    deleteDataDir: deleteDataDir
 };
