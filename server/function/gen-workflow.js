@@ -14,7 +14,7 @@ module.exports = function genWorkflow(config, name, folderName, callback, userna
     let wfFile = Path.join(workflowDir, "workflow.json");
     fs.writeFileSync(wfFile, JSON.stringify(config, null, 4));
     let allStream = fs.createWriteStream(Path.join(workflowDir, "all.txt"));
-    readdir.stream(folder).on('data', function (f) {
+    readdir.stream(folder, {deep: true}).on('data', function (f) {
     }).on('file', function (path) {
         if (/.LAS$/i.test(path))
             allStream.write(Path.join(folder, path) + '\n');
