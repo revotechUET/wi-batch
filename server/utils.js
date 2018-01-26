@@ -19,7 +19,7 @@ function deleteFolder(path) {
 };
 
 function unZipFile(file, username, callback) {
-    extract(file.path, {dir: path.join(__dirname, '../', 'datadir', username, file.name)}, function (err) {
+    extract(file.path, {dir: path.join(__dirname, '../', 'datadir', username, file.name.substring(0, file.name.length - 4))}, function (err) {
         if (err) {
             fs.rmdirSync(path.join(__dirname, '../', 'datadir', username, file.name));
             callback(err, null);

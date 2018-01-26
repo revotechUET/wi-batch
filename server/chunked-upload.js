@@ -56,7 +56,7 @@ function checkFileExisted(username, fileName) {
         }
         try {
             fs.readdirSync(path.join(__dirname, '../', 'datadir', username)).forEach((file) => {
-                if (file === fileName) isExisted = true;
+                if (file === fileName.substring(0, fileName.length - 4)) isExisted = true;
             });
         } catch (err) {
             return resolve(true);
@@ -79,7 +79,7 @@ router.post('/chunked-upload', async function (req, res) {
         if (!passMaxWorkspace) {
             return res.status(500).send({
                 code: 512,
-                reason: "You got max data directory!",
+                reason: "You got max data directory",
                 transactionId: ""
             });
         }
@@ -127,7 +127,6 @@ router.post('/chunked-upload', async function (req, res) {
         utils.unZipFile(file, username, function (err, result) {
             if (err) {
                 console.log(err);
-                // fs.rmdirSync(path.join(__dirname, '../', 'datadir', username, file.name));
                 res.status(512).send({
                     code: 512,
                     reason: err.message,
