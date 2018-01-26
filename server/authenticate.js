@@ -11,6 +11,7 @@ module.exports = function () {
             jwt.verify(token, configApp.jwtSecretKey, function (err, decoded) {
                 if (err) {
                     res.status(401).send(responseJSON(512, "Authentication failed", "Authentication failed"));
+		    res.end();
                 } else {
                     req.decoded = decoded;
                     req.token = token;
