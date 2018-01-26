@@ -51,6 +51,9 @@ function checkFileType(fileName) {
 function checkFileExisted(username, fileName) {
     return new Promise(function (resolve) {
         let isExisted = false;
+        if (!fs.existsSync(path.join(__dirname, '../', 'datadir', username))) {
+            return resolve(isExisted);
+        }
         try {
             fs.readdirSync(path.join(__dirname, '../', 'datadir', username)).forEach((file) => {
                 if (file === fileName) isExisted = true;

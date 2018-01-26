@@ -92,15 +92,14 @@ let deleteDataDir = function (payload, callback, username) {
     let dataPath = path.join(__dirname, '../', 'datadir', username, dataDir);
     utils.deleteFolder(dataPath);
     fs.readdirSync(path.join(__dirname, '../', 'workflows', username)).forEach(file => {
-        if (file != 'readme.txt') {
-            let workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, file)).toString());
-            if (workflowConfig.dataDir === dataDir) {
-                utils.deleteFolder(path.join(__dirname, '../', 'workflows', username));
-                response.push(file);
-            }
+        console.log(file);
+        let workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, file, 'workflow.json')).toString());
+        if (workflowConfig.dataDir === dataDir) {
+            utils.deleteFolder(path.join(__dirname, '../', 'workflows', username, file));
+            response.push(file);
         }
     });
-    responseJSON(200, "Successfull", response);
+    callback(responseJSON(200, "Successfull", response));
 };
 
 module.exports = {
