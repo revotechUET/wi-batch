@@ -5,6 +5,9 @@ let readdir = require('readdir-enhanced');
 module.exports = function genWorkflow(config, name, folderName, callback, username) {
     let workflowDir = Path.join(__dirname, '../../', 'workflows', username, name);
     let folder = Path.join(__dirname, '../../', 'dataDir', username, folderName);
+    if (!fs.existsSync(folder)) {
+        return callback("Data directory is not existed!", null);
+    }
     if (!fs.existsSync(workflowDir)) {
         fs.mkdirSync(workflowDir, 0744);
     } else {
