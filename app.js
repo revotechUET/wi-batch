@@ -18,6 +18,8 @@ app.use(authenticate());
 
 app.use('/', require('./server/chunked-upload'));
 
+let runningWorkflow = {};
+
 io.on('connection', function (socket) {
     console.log("A client connected");
     socket.on('disconnect', function () {
@@ -25,23 +27,43 @@ io.on('connection', function (socket) {
     });
     socket.on('run-workflow', function (data) {
         console.log("Client call");
-        let username;
-        let token = data.token;
-        if (token) {
-            jwt.verify(token, config.app.jwtSecretKey, function (err, decoded) {
-                if (err) {
-                    socket.emit('run-workflow-file-result', {rs: Date.now(), content: err});
-                } else {
-                    username = decoded.username;
-                    data.socket = socket;
-                    controller.runAWorkflow(data, function (response) {
-                        // console.log("Emit all done ", response);
-                        socket.emit('run-workflow-done', {ts: Date.now(), content: response.reason});
-                    }, username, token);
-                }
+        socket.join(data.workflowName);
+        if (runningWorkflow[data.workflowName]) {
+            console.log("Running........");
+            io.sockets.in(data.workflowName).emit('run-workflow-error', {
+                ts: Date.now(),
+                content: "Running..."
             });
         } else {
-            socket.emit('run-workflow-file-result', {ts: Date.now(), content: "No token provided"});
+            runningWorkflow[data.workflowName] = socket;
+            let username;
+            let token = data.token;
+            if (token) {
+                jwt.verify(token, config.app.jwtSecretKey, function (err, decoded) {
+                    if (err) {
+                        io.sockets.in(data.workflowName).emit('run-workflow-file-result', {
+                            rs: Date.now(),
+                            content: err
+                        });
+                    } else {
+                        username = decoded.username;
+                        data.socket = io.sockets.in(data.workflowName);
+                        controller.runAWorkflow(data, function (response) {
+                            // console.log("Emit all done ", response);
+                            io.sockets.in(data.workflowName).emit('run-workflow-done', {
+                                ts: Date.now(),
+                                content: response.reason
+                            });
+                            delete runningWorkflow[data.workflowName];
+                        }, username, token);
+                    }
+                });
+            } else {
+                io.sockets.in(data.workflowName).emit('run-workflow-file-result', {
+                    ts: Date.now(),
+                    content: "No token provided"
+                });
+            }
         }
     });
 });
