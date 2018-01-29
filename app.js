@@ -8,11 +8,15 @@ let http = require('http').Server(app);
 let io = require('socket.io')(http);
 let cors = require('cors');
 let jwt = require('jsonwebtoken');
+let path = require('path');
+
 app.use(cors());
 app.use(express.static("client"));
 app.use(bodyParser.urlencoded({extended: false}));
 
 let authenticate = require('./server/authenticate');
+
+app.use('/log', express.static(path.join(__dirname, 'workflows')));
 
 app.use(authenticate());
 
@@ -26,44 +30,48 @@ io.on('connection', function (socket) {
         console.log("Client out");
     });
     socket.on('run-workflow', function (data) {
-        console.log("Client call");
-        socket.join(data.workflowName);
-        if (runningWorkflow[data.workflowName]) {
-            console.log("Running........");
-            io.sockets.in(data.workflowName).emit('run-workflow-error', {
-                ts: Date.now(),
-                content: "Running..."
-            });
-        } else {
-            runningWorkflow[data.workflowName] = socket;
-            let username;
-            let token = data.token;
-            if (token) {
-                jwt.verify(token, config.app.jwtSecretKey, function (err, decoded) {
-                    if (err) {
-                        io.sockets.in(data.workflowName).emit('run-workflow-file-result', {
-                            rs: Date.now(),
-                            content: err
+        console.log("Client call run workflow");
+        let username;
+        let token = data.token;
+        if (token) {
+            jwt.verify(token, config.app.jwtSecretKey, function (err, decoded) {
+                if (err) {
+                    socket.emit('run-workflow-error', {
+                        rs: Date.now(),
+                        content: err
+                    });
+                } else {
+                    username = decoded.username;
+                    let room = username + "-" + data.workflowName;
+                    socket.join(room);
+                    if (runningWorkflow[room]) {
+                        console.log("Running........");
+                        io.sockets.in(room).emit('run-workflow-error', {
+                            ts: Date.now(),
+                            content: "Running..."
                         });
                     } else {
+                        runningWorkflow[room] = socket;
+                        let username;
+                        let token = data.token;
                         username = decoded.username;
-                        data.socket = io.sockets.in(data.workflowName);
+                        data.socket = io.sockets.in(room);
                         controller.runAWorkflow(data, function (response) {
                             // console.log("Emit all done ", response);
-                            io.sockets.in(data.workflowName).emit('run-workflow-done', {
+                            io.sockets.in(room).emit('run-workflow-done', {
                                 ts: Date.now(),
                                 content: response.reason
                             });
-                            delete runningWorkflow[data.workflowName];
+                            delete runningWorkflow[room];
                         }, username, token);
                     }
-                });
-            } else {
-                io.sockets.in(data.workflowName).emit('run-workflow-file-result', {
-                    ts: Date.now(),
-                    content: "No token provided"
-                });
-            }
+                }
+            });
+        } else {
+            socket.emit('run-workflow-file-result', {
+                ts: Date.now(),
+                content: "No token provided"
+            });
         }
     });
 });
@@ -107,15 +115,16 @@ app.post('/workflow/run', function (req, res) {
 });
 
 app.get('/workflow/list', function (req, res) {
+    // console.log("=============", runningWorkflow);
     controller.listWorkflow(req, function (done) {
         res.send(done);
-    }, req.decoded.username, req.token);
+    }, req.decoded.username, runningWorkflow);
 });
 
 app.post('/workflow/list', function (req, res) {
     controller.listWorkflow(req, function (done) {
         res.send(done);
-    }, req.decoded.username, req.token);
+    }, req.decoded.username, runningWorkflow);
 });
 
 app.post('/workflow/delete', function (req, res) {
@@ -151,6 +160,18 @@ app.post('/workflow/delete-data', function (req, res) {
 app.get('/workflow/delete-data', function (req, res) {
     controller.deleteDataDir(req.query, function (done) {
         res.send(done);
+    }, req.decoded.username);
+});
+
+app.post('/workflow/get-error-log', function (req, res) {
+    controller.getErrorLog(req.body, function (file) {
+        res.sendFile(file);
+    }, req.decoded.username);
+});
+
+app.post('/workflow/get-all-log', function (req, res) {
+    controller.getAllLog(req.body, function (file) {
+        res.sendFile(file);
     }, req.decoded.username);
 });
 

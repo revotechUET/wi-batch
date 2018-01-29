@@ -109,9 +109,9 @@ function uploadMultiFiles(workflowConfig, cb) {
         }, function (res) {
             let content = path.basename(res.path) + " - " + (res.success > 0 ? "Success" : "Failure");
             if (socket) socket.emit("run-workflow-file-result", {ts: Date.now(), content: content});
-            doneStream.write(res.path + "||" + res.success + "\n");
+            doneStream.write(path.basename(res.path) + "||" + res.success + "\n");
             if (res.success === 0) {
-                errorStream.write(res.path + "||" + res.error + "\n");
+                errorStream.write(path.basename(res.path) + "||" + res.error + "\n");
             }
         });
     });

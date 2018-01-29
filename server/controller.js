@@ -5,6 +5,7 @@ let fs = require('fs');
 let path = require('path');
 let utils = require('./utils');
 let responseJSON = require('./response');
+let asyncEach = require('async/each');
 
 let generateNewWorkflow = function (data, callback, username) {
     if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username))) {
@@ -15,7 +16,8 @@ let generateNewWorkflow = function (data, callback, username) {
         host: data.host,
         port: data.port,
         path: data.path,
-        dataDir: data.dataDir
+        dataDir: data.dataDir,
+        ts: Date.now()
     }
     genWorkflow(myConfig, data.workflowName, data.dataDir, function (err, file) {
         if (err) {
@@ -46,7 +48,7 @@ let runAWorkflow = function (data, callback, username, token) {
     });
 };
 
-let listWorkflow = function (data, callback, username) {
+let listWorkflow = function (data, callback, username, runningWorkflow) {
     if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username))) {
         fs.mkdirSync(path.join(__dirname, '../', 'workflows', username));
     }
@@ -56,11 +58,27 @@ let listWorkflow = function (data, callback, username) {
         if (file != 'readme.txt') {
             let info = {};
             info.workflowName = file;
-            info.worflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, file, 'workflow.json')).toString());
+            info.workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, file, 'workflow.json')).toString());
             files.push(info);
         }
     });
-    callback(responseJSON(200, "Successfull", files));
+    asyncEach(files, function (workflow, next) {
+        //new, processed, running
+        if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username, workflow.workflowName, 'done.txt'))) {
+            workflow.status = "new";
+            next();
+        } else {
+            if (runningWorkflow[username + "-" + workflow.workflowName]) {
+                workflow.status = "running";
+                next();
+            } else {
+                workflow.status = "processed";
+                next();
+            }
+        }
+    }, function (err) {
+        callback(responseJSON(200, "Successfull", files));
+    });
 };
 
 let listDataDir = function (data, callback, username) {
@@ -103,11 +121,23 @@ let deleteDataDir = function (payload, callback, username) {
     callback(responseJSON(200, "Successfull", response));
 };
 
+let getErrorLog = function (payload, callback, username) {
+    let filePath = path.join(__dirname, '../', 'workflows', username, payload.workflowName, 'error.txt');
+    callback(filePath);
+};
+
+let getAllLog = function (payload, callback, username) {
+    let filePath = path.join(__dirname, '../', 'workflows', username, payload.workflowName, 'done.txt');
+    callback(filePath);
+};
+
 module.exports = {
     generateNewWorkflow: generateNewWorkflow,
     runAWorkflow: runAWorkflow,
     listWorkflow: listWorkflow,
     deleteWorkflow: deleteWorkflow,
     listDataDir: listDataDir,
-    deleteDataDir: deleteDataDir
+    deleteDataDir: deleteDataDir,
+    getErrorLog: getErrorLog,
+    getAllLog: getAllLog
 };
