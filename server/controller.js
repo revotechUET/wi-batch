@@ -39,7 +39,7 @@ let runAWorkflow = function (data, callback, username, token) {
         workflowConfig.socket = data.socket;
         workflowConfig.token = token;
     } catch (err) {
-        return callback(responseJSON(512, "NO_WORKFLOW_FOUND", {}));
+        return callback(responseJSON(512, "No Workflow found", {}));
     }
     runWorkflow.uploadMultiFiles(workflowConfig, function () {
         callback(responseJSON(200, "Successfull", workflowConfig));

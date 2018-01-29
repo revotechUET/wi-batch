@@ -18,29 +18,30 @@ app.use(authenticate());
 
 app.use('/', require('./server/chunked-upload'));
 
-
 io.on('connection', function (socket) {
     console.log("A client connected");
     socket.on('disconnect', function () {
         console.log("Client out");
     });
     socket.on('run-workflow', function (data) {
+        console.log("Client call");
         let username;
         let token = data.token;
         if (token) {
             jwt.verify(token, config.app.jwtSecretKey, function (err, decoded) {
                 if (err) {
-                    socket.emit('authenticate-failed', {meesage: err});
+                    socket.emit('run-workflow-file-result', {rs: Date.now(), content: err});
                 } else {
                     username = decoded.username;
                     data.socket = socket;
-                    controller.runAWorkflow(data, function () {
-                        socket.emit('run-workflow-done', {meesage: "ALL Done"});
+                    controller.runAWorkflow(data, function (response) {
+                        // console.log("Emit all done ", response);
+                        socket.emit('run-workflow-done', {ts: Date.now(), content: response.reason});
                     }, username, token);
                 }
             });
         } else {
-            socket.emit('authenticate-failed', {message: "No token provided"});
+            socket.emit('run-workflow-file-result', {ts: Date.now(), content: "No token provided"});
         }
     });
 });

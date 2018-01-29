@@ -4,6 +4,7 @@ let fs = require('fs');
 let byline = require('byline');
 let Path = require('path');
 let async = require('async');
+let path = require('path');
 
 function uploadFile(filePath, uploadUrl, headers, callback) {
     console.log("==================================");
@@ -106,8 +107,8 @@ function uploadMultiFiles(workflowConfig, cb) {
             path: tokens[0],
             success: (tokens.length > 1) ? parseInt(tokens[1]) : 0
         }, function (res) {
-            // console.log(res);
-            if (socket) socket.emit("run-workflow-file-result", {message: res});
+            let content = path.basename(res.path) + " - " + (res.success > 0 ? "Success" : "Failure");
+            if (socket) socket.emit("run-workflow-file-result", {ts: Date.now(), content: content});
             doneStream.write(res.path + "||" + res.success + "\n");
             if (res.success === 0) {
                 errorStream.write(res.path + "||" + res.error + "\n");
