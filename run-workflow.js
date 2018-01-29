@@ -144,7 +144,7 @@ function uploadMultiFiles(cb) {
                 }
             );
         }
-    }, 3);
+    }, 10);
 
     queue.drain = function() {
         console.log('All item has been processed');

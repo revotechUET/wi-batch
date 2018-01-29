@@ -1,3 +1,4 @@
+'use strict';
 let request = require('request');
 let fs = require('fs');
 let byline = require('byline');

@@ -1,3 +1,4 @@
+'use strict';
 let fs = require('fs');
 let path = require('path');
 let extract = require('extract-zip');
@@ -19,14 +20,16 @@ function deleteFolder(path) {
 };
 
 function unZipFile(file, username, callback) {
-    extract(file.path, {dir: path.join(__dirname, '../', 'datadir', username, file.name.substring(0, file.name.length - 4))}, function (err) {
+    extract(file.path, {
+        dir: path.join(__dirname, '../', 'datadir', username, file.name)
+    }, function (err, result) {
         if (err) {
-            fs.rmdirSync(path.join(__dirname, '../', 'datadir', username, file.name.substring(0, file.name.length - 4)));
+            fs.rmdirSync(path.join(__dirname, '../', 'datadir', username, file.name));
             callback(err, null);
         } else {
             callback(null, "Extract Done");
         }
-    })
+    });
 }
 
 module.exports = {

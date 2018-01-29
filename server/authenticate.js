@@ -1,3 +1,4 @@
+'use strict';
 let configApp = require('config').app;
 let jwt = require('jsonwebtoken');
 let responseJSON = require('./response');

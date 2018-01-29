@@ -1,3 +1,4 @@
+'use strict';
 let genWorkflow = require('./function/gen-workflow');
 let runWorkflow = require('./function/run-workflow');
 let fs = require('fs');

@@ -1,3 +1,4 @@
+'use strict';
 class Response {
     constructor(code, reason, content) {
         this.code = code;
