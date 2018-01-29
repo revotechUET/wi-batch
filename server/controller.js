@@ -38,7 +38,8 @@ let runAWorkflow = function (data, callback, username, token) {
     try {
         workflowConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'workflows', username, workflowName, 'workflow.json')).toString());
         workflowConfig.workflowDir = path.join(__dirname, '../', 'workflows', username, workflowName);
-        workflowConfig.socket = data.socket;
+        workflowConfig.io = data.io;
+        workflowConfig.room = data.room;
         workflowConfig.token = token;
     } catch (err) {
         return callback(responseJSON(512, "No Workflow found", {}));
@@ -68,7 +69,7 @@ let listWorkflow = function (data, callback, username, runningWorkflow) {
             workflow.status = "new";
             next();
         } else {
-            if (runningWorkflow[username + "-" + workflow.workflowName]) {
+            if (runningWorkflow[username + workflow.workflowName]) {
                 workflow.status = "running";
                 next();
             } else {

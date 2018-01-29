@@ -32,7 +32,8 @@ function uploadFile(filePath, uploadUrl, headers, callback) {
 
 
 function uploadMultiFiles(workflowConfig, cb) {
-    let socket = workflowConfig.socket;
+    let io = workflowConfig.io;
+    let room = workflowConfig.room;
     let workflowDir = workflowConfig.workflowDir;
     let errorStream = fs.createWriteStream(Path.join(workflowDir, 'error.txt'), {'flags': 'a'});
     let doneStream = fs.createWriteStream(Path.join(workflowDir, 'done.txt'), {'flags': 'a'});
@@ -108,7 +109,7 @@ function uploadMultiFiles(workflowConfig, cb) {
             success: (tokens.length > 1) ? parseInt(tokens[1]) : 0
         }, function (res) {
             let content = path.basename(res.path) + " - " + (res.success > 0 ? "Success" : "Failure");
-            if (socket) socket.emit("run-workflow-file-result", {ts: Date.now(), content: content});
+            if (io) io.to(room).emit("run-workflow-file-result", {ts: Date.now(), content: content});
             doneStream.write(path.basename(res.path) + "||" + res.success + "\n");
             if (res.success === 0) {
                 errorStream.write(path.basename(res.path) + "||" + res.error + "\n");

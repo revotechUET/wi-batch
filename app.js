@@ -42,23 +42,24 @@ io.on('connection', function (socket) {
                     });
                 } else {
                     username = decoded.username;
-                    let room = username + "-" + data.workflowName;
-                    socket.join(room);
+                    let room = username + data.workflowName;
                     if (runningWorkflow[room]) {
                         console.log("Running........");
-                        io.sockets.in(room).emit('run-workflow-error', {
+                        io.to(room).emit('run-workflow-error', {
                             ts: Date.now(),
                             content: "Running..."
                         });
                     } else {
-                        runningWorkflow[room] = socket;
+                        socket.join(room);
+                        runningWorkflow[room] = true;
                         let username;
                         let token = data.token;
                         username = decoded.username;
-                        data.socket = io.sockets.in(room);
+                        data.io = io;
+                        data.room = room;
                         controller.runAWorkflow(data, function (response) {
-                            // console.log("Emit all done ", response);
-                            io.sockets.in(room).emit('run-workflow-done', {
+                            console.log("Emit all done ", room);
+                            io.to(room).emit('run-workflow-done', {
                                 ts: Date.now(),
                                 content: response.reason
                             });
