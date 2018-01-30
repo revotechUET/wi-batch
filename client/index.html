@@ -11,10 +11,9 @@
 <script>
     let socket = io("http://localhost:33333");
     let data = {
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR1bmdoeCIsImlhdCI6MTUxNjc1OTk0OCwiZXhwIjoxNTE3ODQ2MzQ4fQ.HjuVOdc1qV1SNVb_UrnGhus9iDeS1aoYuXG7UQCTybk",
-        workflowName: "Archive1"
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhvYW5nIiwicGFzc3dvcmQiOiJjNGNhNDIzOGEwYjkyMzgyMGRjYzUwOWE2Zjc1ODQ5YiIsIndob2FtaSI6Im1haW4tc2VydmljZSIsImlhdCI6MTUxNzI5NTI1NywiZXhwIjoxNTE3NDY4MDU3fQ.g1Z8chkWMAIlhyqn608SyhtGNSs2rk7bYpq81GGVCHc",
+        workflowName: "a"
     };
-    socket.emit("join-room", "tunghx-" + data.workflowName);
     socket.emit("run-workflow", data);
     socket.on("run-workflow-file-result", function (data) {
         document.write(JSON.stringify(data) + "</br>");

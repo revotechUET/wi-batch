@@ -43,6 +43,7 @@ io.on('connection', function (socket) {
                 } else {
                     username = decoded.username;
                     let room = username + data.workflowName;
+                    socket.join(room);
                     if (runningWorkflow[room]) {
                         console.log("Running........");
                         io.to(room).emit('run-workflow-error', {
@@ -50,8 +51,7 @@ io.on('connection', function (socket) {
                             content: "Running..."
                         });
                     } else {
-                        socket.join(room);
-                        runningWorkflow[room] = true;
+                        runningWorkflow[room] = socket;
                         let username;
                         let token = data.token;
                         username = decoded.username;
