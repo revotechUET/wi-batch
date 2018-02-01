@@ -83,28 +83,11 @@ app.get('/', function (req, res) {
 });
 
 
-app.get('/workflow/generate', function (req, res) {
-    let data = {};
-    data.workflowName = req.query.workflowName;
-    data.dataDir = req.query.dataDir;
-    controller.generateNewWorkflow(data, function (done) {
-        res.send(done);
-    }, req.decoded.username, req.token);
-});
-
 app.post('/workflow/generate', function (req, res) {
     controller.generateNewWorkflow(req.body, function (done) {
         res.send(done);
     }, req.decoded.username, req.token);
 
-});
-
-app.get('/workflow/run', function (req, res) {
-    let data = {};
-    data.workflowName = req.query.workflowName;
-    controller.runAWorkflow(data, function (done) {
-        res.send(done);
-    }, req.decoded.username, req.token);
 });
 
 app.post('/workflow/run', function (req, res) {
@@ -113,13 +96,6 @@ app.post('/workflow/run', function (req, res) {
     controller.runAWorkflow(data, function (done) {
         res.send(done);
     }, req.decoded.username, req.token);
-});
-
-app.get('/workflow/list', function (req, res) {
-    // console.log("=============", runningWorkflow);
-    controller.listWorkflow(req, function (done) {
-        res.send(done);
-    }, req.decoded.username, runningWorkflow);
 });
 
 app.post('/workflow/list', function (req, res) {
@@ -134,23 +110,12 @@ app.post('/workflow/delete', function (req, res) {
     }, req.decoded.username, req.token);
 });
 
-app.get('/workflow/delete', function (req, res) {
-    controller.deleteWorkflow(req.query, function (done) {
-        res.send(done);
-    }, req.decoded.username, req.token);
-});
-
 app.post('/workflow/data-list', function (req, res) {
     controller.listDataDir(req.body, function (done) {
         res.send(done);
     }, req.decoded.username, req.token);
 });
 
-app.get('/workflow/data-list', function (req, res) {
-    controller.listDataDir(req.query, function (done) {
-        res.send(done);
-    }, req.decoded.username, req.token);
-});
 
 app.post('/workflow/delete-data', function (req, res) {
     controller.deleteDataDir(req.body, function (done) {
@@ -158,23 +123,11 @@ app.post('/workflow/delete-data', function (req, res) {
     }, req.decoded.username);
 });
 
-app.get('/workflow/delete-data', function (req, res) {
-    controller.deleteDataDir(req.query, function (done) {
-        res.send(done);
-    }, req.decoded.username);
-});
+let uploadRouter = require('./server/simple-upload');
+let wellHeaderRouter = require('./server/well-header');
+app.use('/well-header', uploadRouter);
+app.use('/well-header', wellHeaderRouter);
 
-app.post('/workflow/get-error-log', function (req, res) {
-    controller.getErrorLog(req.body, function (file) {
-        res.sendFile(file);
-    }, req.decoded.username);
-});
-
-app.post('/workflow/get-all-log', function (req, res) {
-    controller.getAllLog(req.body, function (file) {
-        res.sendFile(file);
-    }, req.decoded.username);
-});
 
 http.listen(config.app.port, (err) => {
     if (!err) console.log('Server is listening on', config.app.port);

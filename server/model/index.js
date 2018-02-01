@@ -25,13 +25,16 @@ sequelize.sync()
         console.log(err);
     });
 let models = [
-    'User'
+    'User',
+    'UserFileUploaded',
+    'WellHeader'
 ];
 models.forEach(function (model) {
     module.exports[model] = sequelize.import(__dirname + '/' + model);
 });
 
 (function (m) {
-
+    m.User.hasMany(m.UserFileUploaded, {foreignKey: {name: "username", allowNull: false}, onDelete: 'CASCADE'});
+    m.User.hasMany(m.WellHeader, {foreignKey: {name: "username", allowNull: false}, onDelete: 'CASCADE'});
 })(module.exports);
 module.exports.sequelize = sequelize;

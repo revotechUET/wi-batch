@@ -6,6 +6,7 @@ let path = require('path');
 let utils = require('./utils');
 let responseJSON = require('./response');
 let asyncEach = require('async/each');
+let model = require('./model');
 
 let generateNewWorkflow = function (data, callback, username) {
     if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username))) {
@@ -122,15 +123,6 @@ let deleteDataDir = function (payload, callback, username) {
     callback(responseJSON(200, "Successfull", response));
 };
 
-let getErrorLog = function (payload, callback, username) {
-    let filePath = path.join(__dirname, '../', 'workflows', username, payload.workflowName, 'error.txt');
-    callback(filePath);
-};
-
-let getAllLog = function (payload, callback, username) {
-    let filePath = path.join(__dirname, '../', 'workflows', username, payload.workflowName, 'done.txt');
-    callback(filePath);
-};
 
 module.exports = {
     generateNewWorkflow: generateNewWorkflow,
@@ -138,7 +130,5 @@ module.exports = {
     listWorkflow: listWorkflow,
     deleteWorkflow: deleteWorkflow,
     listDataDir: listDataDir,
-    deleteDataDir: deleteDataDir,
-    getErrorLog: getErrorLog,
-    getAllLog: getAllLog
+    deleteDataDir: deleteDataDir
 };
