@@ -43,7 +43,7 @@ function updateWellHeader(data, token, callback) {
 module.exports = function (wells, token, callback, username) {
     let reponse = [];
     asyncEach(wells, function (well, next) {
-        findWellByName(well.NAME, token, function (err, foundWell) {
+        findWellByName(well.WELL_NAME, token, function (err, foundWell) {
             if (err) {
                 next(err);
             } else {
@@ -57,8 +57,13 @@ module.exports = function (wells, token, callback, username) {
                     queue.drain = async function () {
                         console.log("ALL HEADER FOR " + foundWell.name + " DONE");
                         await model.WellHeader.findOrCreate({
-                            where: {wellName: foundWell.name, username: username},
-                            defaults: {wellName: foundWell.name, header: well, username: username}
+                            where: {wellName: foundWell.name, idWell: foundWell.idWell, username: username},
+                            defaults: {
+                                wellName: foundWell.name,
+                                idWell: foundWell.idWell,
+                                header: well,
+                                username: username
+                            }
                         });
                         reponse.push(foundWell.name);
                         next();

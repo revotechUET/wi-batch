@@ -123,6 +123,13 @@ app.post('/workflow/delete-data', function (req, res) {
     }, req.decoded.username);
 });
 
+app.post('/well/create-well', function (req, res) {
+    controller.makeRequestToBackend(req.body, function (done) {
+        res.send(done);
+    }, req.decoded.username, req.token);
+});
+
+
 let uploadRouter = require('./server/simple-upload');
 let wellHeaderRouter = require('./server/well-header');
 app.use('/well-header', uploadRouter);

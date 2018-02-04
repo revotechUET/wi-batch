@@ -3,8 +3,10 @@
     "port": 33333,
     "jwtSecretKey": "secretKey",
     "USER_MAX_DATADIR": 3,
-    "oInvHost":"13.229.66.151",
-    "oInvPort":"80"
+    "oInvHost": "13.229.66.151",
+    "oInvPort": "80",
+    "backendHost": "dev.sflow.me",
+    "backendPort": "80"
   },
   "database": {
     "host": "localhost",

@@ -9,6 +9,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
+        idWell: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         header: {
             type: DataTypes.TEXT,
             allowNull: false,

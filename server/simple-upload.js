@@ -6,6 +6,7 @@ let response = require('./response');
 let path = require('path');
 let model = require('./model');
 let fs = require('fs');
+let asyncEach = require('async/eachSeries');
 
 
 let storage = multer.diskStorage({
@@ -26,14 +27,27 @@ function processingCSVFile(file, user, callback) {
     let filePath = path.join(__dirname, '../', file.path);
     const csv = require('csvtojson');
     let time = Date.now().toString();
-    let jsonData = [];
+    let fileData = [];
     let jsonPath = path.join(__dirname, '../', 'uploads', user.username, time + '.json');
-    csv().fromFile(filePath).on('json', function (row) {
-        jsonData.push(row);
+    csv({noheader: true}).fromFile(filePath).on('json', function (row) {
+        fileData.push(row);
     }).on('done', function (err) {
-        fs.writeFileSync(jsonPath, JSON.stringify(jsonData));
-        fs.unlinkSync(filePath);
-        console.log("End with Err : ", err)
+        // rename first colummn to WELL_NAME :TODO
+        let finalData = [];
+        fileData[0].field1 = "WELL_NAME";
+        let header = fileData.splice(0, 1);
+        asyncEach(fileData, function (data, next) {
+            let obj = {};
+            for (let i in data, header[0]) {
+                obj[header[0][i]] = data[i];
+            }
+            finalData.push(obj);
+            next();
+        }, function () {
+            fs.writeFileSync(jsonPath, JSON.stringify(finalData));
+            fs.unlinkSync(filePath);
+            console.log("End with Err : ", err)
+        });
     });
     model.UserFileUploaded.create({
         uploadedTime: time,

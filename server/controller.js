@@ -1,6 +1,7 @@
 'use strict';
 let genWorkflow = require('./function/gen-workflow');
 let runWorkflow = require('./function/run-workflow');
+let createNewWell = require('./function/create-new-well');
 let fs = require('fs');
 let path = require('path');
 let utils = require('./utils');
@@ -123,6 +124,23 @@ let deleteDataDir = function (payload, callback, username) {
     callback(responseJSON(200, "Successfull", response));
 };
 
+let makeRequestToBackend = function (payload, callback, username, token) {
+    model.WellHeader.findAll({
+        where: {
+            username: username
+        }
+    }).then(wells => {
+        createNewWell({projectName: payload.projectName, wells: wells}, token, function (err, success) {
+            if (err) {
+                callback(responseJSON(512, "Error", err));
+            } else {
+                callback(responseJSON(200, "Successfull", success));
+            }
+        }, username);
+    }).catch(err => {
+        callback(responseJSON(512, "Error", err));
+    });
+};
 
 module.exports = {
     generateNewWorkflow: generateNewWorkflow,
@@ -130,5 +148,6 @@ module.exports = {
     listWorkflow: listWorkflow,
     deleteWorkflow: deleteWorkflow,
     listDataDir: listDataDir,
-    deleteDataDir: deleteDataDir
+    deleteDataDir: deleteDataDir,
+    makeRequestToBackend: makeRequestToBackend
 };
