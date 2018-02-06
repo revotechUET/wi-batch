@@ -130,10 +130,14 @@ app.post('/well/create-well', function (req, res) {
 });
 
 
-let uploadRouter = require('./server/simple-upload');
-let wellHeaderRouter = require('./server/well-header');
-app.use('/well-header', uploadRouter);
+let wellHeaderUpload = require('./server/well-header/well-header-upload');
+let wellHeaderRouter = require('./server/well-header/well-header');
+let wellTopUpload = require('./server/well-top/well-top-upload');
+let wellTopRouter = require('./server/well-top/well-top');
+app.use('/well-header', wellHeaderUpload);
 app.use('/well-header', wellHeaderRouter);
+app.use('/well-top', wellTopUpload);
+app.use('/well-top', wellTopRouter);
 
 
 http.listen(config.app.port, (err) => {

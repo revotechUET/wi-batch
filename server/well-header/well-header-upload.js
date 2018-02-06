@@ -1,18 +1,18 @@
 let multer = require('multer');
 let express = require('express');
 let router = express.Router();
-let utils = require('./utils');
-let response = require('./response');
+let utils = require('../utils');
+let response = require('../response');
 let path = require('path');
-let model = require('./model');
+let model = require('../model/index');
 let fs = require('fs');
 let asyncEach = require('async/eachSeries');
 
 
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        if (!fs.existsSync(path.join(__dirname, '../', 'uploads', req.decoded.username))) {
-            fs.mkdirSync(path.join(__dirname, '../', 'uploads', req.decoded.username));
+        if (!fs.existsSync(path.join(__dirname, '../../', 'uploads', req.decoded.username))) {
+            fs.mkdirSync(path.join(__dirname, '../../', 'uploads', req.decoded.username));
         }
         cb(null, 'uploads/' + req.decoded.username);
     },
@@ -24,11 +24,11 @@ let storage = multer.diskStorage({
 let upload = multer({storage: storage});
 
 function processingCSVFile(file, user, callback) {
-    let filePath = path.join(__dirname, '../', file.path);
+    let filePath = path.join(__dirname, '../../', file.path);
     const csv = require('csvtojson');
     let time = Date.now().toString();
     let fileData = [];
-    let jsonPath = path.join(__dirname, '../', 'uploads', user.username, time + '.json');
+    let jsonPath = path.join(__dirname, '../../', 'uploads', user.username, time + '.json');
     csv({noheader: true}).fromFile(filePath).on('json', function (row) {
         fileData.push(row);
     }).on('done', function (err) {

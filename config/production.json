@@ -5,8 +5,8 @@
     "USER_MAX_DATADIR": 3,
     "oInvHost": "13.229.66.151",
     "oInvPort": "80",
-    "backendHost": "dev.sflow.me",
-    "backendPort": "80"
+    "backendHost": "127.0.0.1",
+    "backendPort": "3000"
   },
   "database": {
     "host": "localhost",

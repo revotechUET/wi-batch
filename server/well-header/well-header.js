@@ -1,10 +1,10 @@
 let express = require('express');
 let router = express.Router();
-let model = require('./model');
-let response = require('./response');
+let model = require('../model/index');
+let response = require('../response');
 let path = require('path');
 let fs = require('fs');
-let importWellHeader = require('./function/import-well-header');
+let importWellHeader = require('../function/import-well-header');
 
 const fileType = "WELL_HEADER";
 router.post('/list-file', function (req, res) {
@@ -31,7 +31,7 @@ router.post('/list-success', function (req, res) {
 router.post('/info', function (req, res) {
     model.UserFileUploaded.findById(req.body.idUserFileUploaded).then(file => {
         if (file) {
-            let filePath = path.join(__dirname, '../', 'uploads', req.decoded.username, file.uploadedTime + '.json');
+            let filePath = path.join(__dirname, '../../', 'uploads', req.decoded.username, file.uploadedTime + '.json');
             file = file.toJSON();
             file.data = JSON.parse(fs.readFileSync(filePath).toString());
             res.send(response(200, "Successfull", file));
@@ -45,7 +45,7 @@ router.post('/delete', function (req, res) {
     model.UserFileUploaded.findById(req.body.idUserFileUploaded).then(file => {
         if (file) {
             file.destroy().then(() => {
-                let filePath = path.join(__dirname, '../', 'uploads', req.decoded.username, file.uploadedTime + '.json');
+                let filePath = path.join(__dirname, '../../', 'uploads', req.decoded.username, file.uploadedTime + '.json');
                 if (fs.existsSync(filePath)) {
                     fs.unlinkSync(filePath);
                 }
@@ -60,7 +60,7 @@ router.post('/delete', function (req, res) {
 router.post('/run', function (req, res) {
     model.UserFileUploaded.findById(req.body.idUserFileUploaded).then(file => {
         if (file) {
-            let filePath = path.join(__dirname, '../', 'uploads', req.decoded.username, file.uploadedTime + '.json');
+            let filePath = path.join(__dirname, '../../', 'uploads', req.decoded.username, file.uploadedTime + '.json');
             if (!fs.existsSync(filePath)) {
                 res.send(response(512, "No data found by this file", {}));
             } else {

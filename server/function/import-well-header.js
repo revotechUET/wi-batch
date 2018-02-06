@@ -74,7 +74,7 @@ module.exports = function (wells, token, callback, username) {
                         });
                     }
                 } else {
-                    console.log("No well found by name ", well.NAME);
+                    console.log("No well found by name ", well.WELL_NAME);
                     next();
                 }
             }
