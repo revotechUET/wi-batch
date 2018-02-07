@@ -3,7 +3,7 @@
     "port": 33333,
     "jwtSecretKey": "secretKey",
     "USER_MAX_DATADIR": 3,
-    "oInvHost": "13.250.177.181",
+    "oInvHost": "inv.sflow.me",
     "oInvPort": "80",
     "backendHost": "127.0.0.1",
     "backendPort": "3000"
