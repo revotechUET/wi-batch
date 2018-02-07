@@ -62,7 +62,7 @@ function uploadMultiFiles(workflowConfig, cb) {
                         resObj = JSON.parse(res);
                     }
                     catch (err) {
-                        console.log("error:", err);
+                        console.log("error:", res);
                         callback({
                             path: task.path,
                             success: 0,

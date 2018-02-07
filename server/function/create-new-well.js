@@ -22,6 +22,7 @@ function makeImportWellRequest(well, token, callback) {
         if (error) {
             callback(error, null);
         } else {
+            console.log(body);
             callback(null, body.content);
         }
     });
@@ -35,6 +36,7 @@ module.exports = function (data, token, callback, username) {
             idWell: well.idWell,
             projectName: data.projectName
         }, token, function (err, done) {
+            console.log("Make request : ", well.wellName);
             cb(err, done);
         });
     }, 1);
