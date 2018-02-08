@@ -7,6 +7,7 @@ module.exports = function genWorkflow(config, name, folderName, callback, userna
     let workflowDir = Path.join(__dirname, '../../', 'workflows', username, name);
     console.log(folderName);
     let folder = Path.join(__dirname, '../../', 'dataDir', username, folderName);
+    console.log(fs.existsSync(folder));
     if (!fs.existsSync(folder)) {
         return callback("Data directory is not existed!", null);
     }
