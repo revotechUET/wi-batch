@@ -54,9 +54,9 @@ module.exports = function (wells, token, callback, username) {
                             callback(done);
                         });
                     }, 3);
-                    queue.drain = async function () {
+                    queue.drain = function () {
                         console.log("ALL HEADER FOR " + foundWell.name + " DONE");
-                        await model.WellHeader.findOrCreate({
+                        model.WellHeader.findOrCreate({
                             where: {wellName: foundWell.name, idWell: foundWell.idWell, username: username},
                             defaults: {
                                 wellName: foundWell.name,
@@ -64,9 +64,20 @@ module.exports = function (wells, token, callback, username) {
                                 header: well,
                                 username: username
                             }
+                        }).then(rs => {
+                            if (rs[1]) {
+                                reponse.push(foundWell.name);
+                                next();
+                            } else {
+                                rs[0].header = well;
+                                rs[0].save();
+                                reponse.push(foundWell.name);
+                                next();
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                            next();
                         });
-                        reponse.push(foundWell.name);
-                        next();
                     };
                     for (let header in well) {
                         queue.push({idWell: foundWell.idWell, header: header, value: well[header]}, function (res) {
