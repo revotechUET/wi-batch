@@ -5,14 +5,12 @@ let readdir = require('readdir-enhanced');
 
 module.exports = function genWorkflow(config, name, folderName, callback, username) {
     let workflowDir = Path.join(__dirname, '../../', 'workflows', username, name);
-    console.log(folderName);
-    let folder = Path.join(__dirname, '../../', 'dataDir', username, folderName);
-    console.log(fs.existsSync(folder));
+    let folder = Path.join(__dirname, '../../', 'datadir', username, folderName);
     if (!fs.existsSync(folder)) {
         return callback("Data directory is not existed!", null);
     }
-    console.log(fs.existsSync(workflowDir));
     if (!fs.existsSync(workflowDir)) {
+        console.log("Create workflow dir ", workflowDir);
         fs.mkdirSync(workflowDir);
     } else {
         console.error("Batch job existed!");
