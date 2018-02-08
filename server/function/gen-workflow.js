@@ -10,9 +10,9 @@ module.exports = function genWorkflow(config, name, folderName, callback, userna
     if (!fs.existsSync(folder)) {
         return callback("Data directory is not existed!", null);
     }
-    if (!fs.existsSync(Path.join(__dirname, '../../', 'workflows', username, name))) {
-        console.log("Make workflow dir ", Path.join(__dirname, '../../', 'workflows', username, name));
-        fs.mkdirSync(Path.join(__dirname, '../../', 'workflows', username, name));
+    console.log(fs.existsSync(workflowDir));
+    if (!fs.existsSync(workflowDir)) {
+        fs.mkdirSync(workflowDir);
     } else {
         console.error("Batch job existed!");
         return callback("Batch job existed!", null);
