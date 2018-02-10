@@ -7,7 +7,7 @@ let async = require('async');
 let path = require('path');
 
 function uploadFile(filePath, uploadUrl, headers, callback) {
-    let overwrite = "true";
+    let override = "true";
     console.log("==================================");
     console.log('uploadFile:' + filePath);
     let options = {
@@ -22,7 +22,7 @@ function uploadFile(filePath, uploadUrl, headers, callback) {
                     contentType: null
                 }
             },
-            override: overwrite
+            override: override
         }
     };
     console.log("Send request for " + filePath);
