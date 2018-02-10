@@ -23,11 +23,42 @@ app.use(authenticate());
 app.use('/', require('./server/chunked-upload'));
 
 let runningWorkflow = {};
+// io.use((socket, next) => {
+//     // if (socket.request.headers.cookie) return next();
+//     // next(new Error('Authentication error'));
+//     console.log("Middleware");
+//     next();
+// });
 
 io.on('connection', function (socket) {
     console.log("A client connected");
     socket.on('disconnect', function () {
         console.log("Client out");
+    });
+    socket.on('well-header', function (data) {
+        if (data.token) {
+            jwt.verify(data.token, config.app.jwtSecretKey, function (err, decoded) {
+                if (err) {
+                    socket.emit('well-header-error', {
+                        ts: Date.now(),
+                        content: err
+                    });
+                } else {
+                    let username = decoded.username;
+                    let room = username + '-well-header';
+                    socket.join(room);
+                    if (runningWorkflow[room]) {
+                        console.log("Running........");
+                        io.to(room).emit('well-header-error', {
+                            ts: Date.now(),
+                            content: "Running..."
+                        });
+                    } else {
+                        runningWorkflow[room] = socket;
+                    }
+                }
+            });
+        }
     });
     socket.on('run-workflow', function (data) {
         console.log("Client call run workflow");
@@ -37,7 +68,7 @@ io.on('connection', function (socket) {
             jwt.verify(token, config.app.jwtSecretKey, function (err, decoded) {
                 if (err) {
                     socket.emit('run-workflow-error', {
-                        rs: Date.now(),
+                        ts: Date.now(),
                         content: err
                     });
                 } else {
