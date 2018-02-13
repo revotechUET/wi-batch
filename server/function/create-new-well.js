@@ -49,8 +49,9 @@ module.exports = function (data, token, callback, username) {
             if (err) {
                 response.wells.push({well: well.wellName, result: err.code + " - " + err.reason});
             } else {
+                console.log(done);
                 response.idProject = done.content.idProject ? done.content.idProject : response.idProject;
-                response.wells.push({well: well.wellName, result: done.reason});
+                response.wells.push({well: well.wellName, result: done.reason, content: done.content});
             }
         });
     });
