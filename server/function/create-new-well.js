@@ -22,21 +22,21 @@ function makeImportWellRequest(well, token, callback) {
         if (error) {
             callback(error, null);
         } else {
-            console.log(body);
-            callback(null, body.content);
+            callback(null, body);
         }
     });
 };
 
 module.exports = function (data, token, callback, username) {
-    let response = [];
+    let response = {};
+    response.idProject = null;
+    response.wells = [];
     let queue = asyncQueue(function (well, cb) {
         makeImportWellRequest({
             name: well.wellName,
             idWell: well.idWell,
             projectName: data.projectName
         }, token, function (err, done) {
-            console.log("Make request : ", well.wellName);
             cb(err, done);
         });
     }, 1);
@@ -47,9 +47,10 @@ module.exports = function (data, token, callback, username) {
     data.wells.forEach(function (well) {
         queue.push(well, function (err, done) {
             if (err) {
-                response.push({well: well.wellName, result: "Error : " + err.message});
+                response.wells.push({well: well.wellName, result: err.code + " - " + err.reason});
             } else {
-                response.push({well: well.wellName, result: "Successfull : " + JSON.stringify(done)});
+                response.idProject = done.content.idProject ? done.content.idProject : response.idProject;
+                response.wells.push({well: well.wellName, result: done.reason});
             }
         });
     });

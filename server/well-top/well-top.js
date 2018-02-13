@@ -83,9 +83,9 @@ router.post('/run', function (req, res) {
                     };
                     request(options, function (error, resp, body) {
                         if (error) {
-                            res.send(response(512, "Error", error));
+                            res.send(error);
                         } else {
-                            res.send(response(200, "Successfull", body));
+                            res.send(body);
                         }
                     });
 
