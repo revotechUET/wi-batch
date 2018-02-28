@@ -70,6 +70,7 @@ module.exports = function (wells, token, callback, username) {
                                 reponse.push(foundWell.name);
                                 next();
                             } else {
+                                rs[0].idWell = foundWell.idWell;
                                 rs[0].header = well;
                                 rs[0].save();
                                 reponse.push(foundWell.name);
