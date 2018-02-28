@@ -57,7 +57,8 @@ module.exports = function (wells, token, callback, username) {
                     queue.drain = function () {
                         console.log("ALL HEADER FOR " + foundWell.name + " DONE");
                         model.WellHeader.findOrCreate({
-                            where: {wellName: foundWell.name, idWell: foundWell.idWell, username: username},
+                            // where: {wellName: foundWell.name, idWell: foundWell.idWell, username: username},
+                            where: {wellName: foundWell.name, username: username},
                             defaults: {
                                 wellName: foundWell.name,
                                 idWell: foundWell.idWell,
