@@ -14,7 +14,7 @@ class Options {
         this.body = payload;
         this.json = true;
     }
-};
+}
 
 function makeImportWellRequest(well, token, callback) {
     let options = new Options('/project/well/import-from-inventory', token, well);

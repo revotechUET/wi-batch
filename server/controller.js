@@ -8,6 +8,7 @@ let utils = require('./utils');
 let responseJSON = require('./response');
 let asyncEach = require('async/each');
 let model = require('./model');
+let findWellByCurveName = require('./function/find-well-by-curve-name');
 
 let generateNewWorkflow = function (data, callback, username) {
     if (!fs.existsSync(path.join(__dirname, '../', 'workflows', username))) {
@@ -125,24 +126,45 @@ let deleteDataDir = function (payload, callback, username) {
 };
 
 let makeRequestToBackend = function (payload, callback, username, token) {
-    model.WellHeader.findAll({
-        where: {
-            username: username
-        }
-    }).then(wells => {
-        if (payload.notWellTop) {
-            wells = payload.wells;
-        }
-        createNewWell({projectName: payload.projectName, wells: wells}, token, function (err, success) {
+    if (payload.curves) {
+        findWellByCurveName({names: payload.curves}, token, function (err, success) {
             if (err) {
                 callback(responseJSON(512, "Error", err));
             } else {
-                callback(responseJSON(200, "Successfull", success));
+                if (success.content.length === 0) {
+                    callback(responseJSON(200, "No wells found by curves", []));
+                } else {
+                    console.log(success.content);
+                    createNewWell({
+                        projectName: payload.projectName,
+                        wells: success.content
+                    }, token, function (err, success) {
+                        if (err) {
+                            callback(responseJSON(512, "Error", err));
+                        } else {
+                            callback(responseJSON(200, "Successfull", success));
+                        }
+                    }, username);
+                }
             }
-        }, username);
-    }).catch(err => {
-        callback(responseJSON(512, "Error", err));
-    });
+        });
+    } else {
+        model.WellHeader.findAll({
+            where: {
+                username: username
+            }
+        }).then(wells => {
+            createNewWell({projectName: payload.projectName, wells: wells}, token, function (err, success) {
+                if (err) {
+                    callback(responseJSON(512, "Error", err));
+                } else {
+                    callback(responseJSON(200, "Successfull", success));
+                }
+            }, username);
+        }).catch(err => {
+            callback(responseJSON(512, "Error", err));
+        });
+    }
 };
 
 module.exports = {
