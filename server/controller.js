@@ -130,6 +130,9 @@ let makeRequestToBackend = function (payload, callback, username, token) {
             username: username
         }
     }).then(wells => {
+        if (payload.notWellTop) {
+            wells = payload.wells;
+        }
         createNewWell({projectName: payload.projectName, wells: wells}, token, function (err, success) {
             if (err) {
                 callback(responseJSON(512, "Error", err));
